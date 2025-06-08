@@ -56,3 +56,19 @@ def get_district_keyboard(lang: str, selected: list[str] = []) -> InlineKeyboard
     buttons.append([InlineKeyboardButton(text="✅ Далі" if lang == "uk" else "✅ Next", callback_data="districts_done")])
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def get_budget_keyboard(lang: str, selected: list[str] = []) -> InlineKeyboardMarkup:
+    all_ranges = {
+        "uk": ["До 15 тис.", "15-20 тис.", "20-25 тис.", "25-30 тис.", "30-35 тис.", "35-45 тис.", "45-60 тис.", "60+ тис."],
+        "en": ["Up to 15k", "15-20k", "20-25k", "25-30k", "30-35k", "35-45k", "45-60k", "60k+"]
+    }
+
+    def checked(val): return "✅" if val in selected else "👉"
+
+    buttons = [
+        [InlineKeyboardButton(text=f"{checked(b)} {b}", callback_data=f"budget_{b}")]
+        for b in all_ranges[lang]
+    ]
+    buttons.append([InlineKeyboardButton(text="✅ Готово" if lang == "uk" else "✅ Done", callback_data="budget_done")])
+    return InlineKeyboardMarkup(inline_keyboard=buttons)

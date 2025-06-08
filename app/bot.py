@@ -2,7 +2,8 @@ import asyncio
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.types import Message, CallbackQuery
 from config import BOT_TOKEN
-from app.keyboards import get_language_keyboard, get_service_keyboard, get_room_keyboard, get_district_keyboard
+from app.keyboards import get_language_keyboard, get_service_keyboard, get_room_keyboard, get_district_keyboard, \
+    get_budget_keyboard
 from app.texts import texts
 
 
@@ -128,7 +129,47 @@ async def districts_done(callback: CallbackQuery):
     districts = ', '.join(selected) if selected else texts[lang]["no_districts"]
     await callback.message.edit_reply_markup()
     await callback.message.answer(texts[lang]["districts_done"].format(districts=districts))
+    await callback.message.answer(
+        texts[lang]["select_budget"],
+        reply_markup=get_budget_keyboard(lang)
+    )
+    user_data[user_id]["budget"] = []
+
+
+@dp.callback_query(F.data.startswith("budget_"))
+async def select_budget(callback: CallbackQuery):
+    user_id = callback.from_user.id
+    lang = user_data.get(user_id, {}).get("lang", "uk")
+    selected = user_data[user_id].get("budget", [])
+
+    value = callback.data.split("_", 1)[1]
+    if value in selected:
+        selected.remove(value)
+    else:
+        selected.append(value)
+
+    user_data[user_id]["budget"] = selected
+
+    try:
+        await callback.message.edit_reply_markup(reply_markup=get_budget_keyboard(lang, selected))
+    except Exception as e:
+        print(f"⚠️ Не оновлено бюджет: {e}")
+
     await callback.answer()
+
+
+
+@dp.callback_query(F.data == "budget_done")
+async def budget_done(callback: CallbackQuery):
+    user_id = callback.from_user.id
+    lang = user_data.get(user_id, {}).get("lang", "uk")
+    selected = user_data[user_id].get("budget", [])
+
+    budget = ', '.join(selected) if selected else texts[lang]["no_budget"]
+    await callback.message.edit_reply_markup()
+    await callback.message.answer(texts[lang]["budget_done"].format(budget=budget))
+    await callback.answer()
+
 
 
 async def main():

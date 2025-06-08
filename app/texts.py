@@ -11,7 +11,10 @@ texts = {
         "no_rooms": "нічого 😢",
         "select_districts": "У яких районах шукаєш квартиру?",
         "districts_done": "Обрані райони: {districts}",
-        "no_districts": "нічого 😢"
+        "no_districts": "нічого 😢",
+        "select_budget": "На яку суму ти розраховуєш? 💸",
+        "budget_done": "Обрано діапазони: {budget}",
+        "no_budget": "нічого 😢"
     },
     "en": {
         "select_language": "Hello! What language do you prefer to use? 🌐",
@@ -25,6 +28,9 @@ texts = {
         "no_rooms": "nothing 😢",
         "select_districts": "Which districts are you interested in?",
         "districts_done": "Selected districts: {districts}",
-        "no_districts": "nothing 😢"
+        "no_districts": "nothing 😢",
+        "select_budget": "What is your budget range? 💸",
+        "budget_done": "Selected ranges: {budget}",
+        "no_budget": "nothing 😢"
     }
 }
