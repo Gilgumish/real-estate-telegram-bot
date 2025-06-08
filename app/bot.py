@@ -2,7 +2,7 @@ import asyncio
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.types import Message, CallbackQuery
 from config import BOT_TOKEN
-from app.keyboards import get_language_keyboard, get_service_keyboard, get_room_keyboard
+from app.keyboards import get_language_keyboard, get_service_keyboard, get_room_keyboard, get_district_keyboard
 from app.texts import texts
 
 
@@ -36,14 +36,33 @@ async def language_selected(callback: CallbackQuery):
 
 
 
+from config import ADMIN_ID
+
 @dp.callback_query(F.data.startswith("service_"))
 async def service_selected(callback: CallbackQuery):
     await callback.message.delete()
     service = callback.data.split("_")[1]
     user_id = callback.from_user.id
-
     lang = user_data.get(user_id, {}).get("lang", "uk")
 
+    if service == "sell":
+        # 📩 Повідомлення адміну
+        await bot.send_message(
+            ADMIN_ID,
+            f"🧾 Новий запит на продаж/оренду!\n"
+            f"Ім’я: {callback.from_user.full_name}\n"
+            f"Username: @{callback.from_user.username or 'немає'}\n"
+            f"ID: {user_id}"
+        )
+
+        # ✅ Повідомлення користувачу
+        confirm_text = "Дякуємо! Наш ріелтор зв'яжеться з вами найближчим часом." if lang == "uk" else \
+                       "Thank you! Our agent will contact you shortly."
+        await callback.message.answer(confirm_text)
+        await callback.answer()
+        return
+
+    # Інша логіка (rent/buy)
     await callback.message.answer(texts[lang][service])
     await callback.message.answer(texts[lang]["select_rooms"], reply_markup=get_room_keyboard(lang))
     await callback.answer()
@@ -72,10 +91,43 @@ async def rooms_done(callback: CallbackQuery):
     user_id = callback.from_user.id
     lang = user_data.get(user_id, {}).get("lang", "uk")
     selected_rooms = user_data.get(user_id, {}).get("rooms", [])
-
     rooms = ', '.join(selected_rooms) if selected_rooms else texts[lang]["no_rooms"]
+
     await callback.message.edit_reply_markup()
     await callback.message.answer(texts[lang]["rooms_done"].format(rooms=rooms))
+
+    user_data[user_id]["districts"] = []
+    await callback.message.answer(texts[lang]["select_districts"], reply_markup=get_district_keyboard(lang))
+    await callback.answer()
+
+
+@dp.callback_query(F.data.startswith("district_"))
+async def select_district(callback: CallbackQuery):
+    user_id = callback.from_user.id
+    lang = user_data.get(user_id, {}).get("lang", "uk")
+    selected = user_data.get(user_id, {}).get("districts", [])
+
+    district = callback.data.split("_", 1)[1]
+    if district in selected:
+        selected.remove(district)
+    else:
+        selected.append(district)
+
+    user_data[user_id]["districts"] = selected
+
+    await callback.message.edit_reply_markup(reply_markup=get_district_keyboard(lang, selected))
+    await callback.answer()
+
+
+@dp.callback_query(F.data == "districts_done")
+async def districts_done(callback: CallbackQuery):
+    user_id = callback.from_user.id
+    lang = user_data.get(user_id, {}).get("lang", "uk")
+    selected = user_data.get(user_id, {}).get("districts", [])
+
+    districts = ', '.join(selected) if selected else texts[lang]["no_districts"]
+    await callback.message.edit_reply_markup()
+    await callback.message.answer(texts[lang]["districts_done"].format(districts=districts))
     await callback.answer()
 
 

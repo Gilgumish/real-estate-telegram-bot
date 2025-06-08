@@ -39,3 +39,20 @@ def get_room_keyboard(lang: str, selected: list[str] = []) -> InlineKeyboardMark
         [InlineKeyboardButton(text=f"{checked('4+')} 4+", callback_data="room_4+")],
         [InlineKeyboardButton(text=next_btn, callback_data="rooms_done")]
     ])
+
+
+def get_district_keyboard(lang: str, selected: list[str] = []) -> InlineKeyboardMarkup:
+    all_districts = {
+        "uk": ["Центр", "Лук’янівка", "Позняки", "Оболонь", "Троєщина", "Дарниця", "Голосієво", "Шулявка"],
+        "en": ["Center", "Lukyanivka", "Pozniaky", "Obolon", "Troieshchyna", "Darnytsia", "Holosiiv", "Shuliavka"]
+    }
+
+    def checked(val): return "✅" if val in selected else "👉"
+
+    buttons = [
+        [InlineKeyboardButton(text=f"{checked(d)} {d}", callback_data=f"district_{d}")]
+        for d in all_districts[lang]
+    ]
+    buttons.append([InlineKeyboardButton(text="✅ Далі" if lang == "uk" else "✅ Next", callback_data="districts_done")])
+
+    return InlineKeyboardMarkup(inline_keyboard=buttons)

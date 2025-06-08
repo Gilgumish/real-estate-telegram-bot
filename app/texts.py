@@ -8,7 +8,10 @@ texts = {
         "sell": "📦 Чудово! Давай допоможемо здати або продати твоє житло.",
         "select_rooms": "Скільки повинно бути кімнат у квартирі?",
         "rooms_done": "Обрано: {rooms}",
-        "no_rooms": "нічого 😢"
+        "no_rooms": "нічого 😢",
+        "select_districts": "У яких районах шукаєш квартиру?",
+        "districts_done": "Обрані райони: {districts}",
+        "no_districts": "нічого 😢"
     },
     "en": {
         "select_language": "Hello! What language do you prefer to use? 🌐",
@@ -19,6 +22,9 @@ texts = {
         "sell": "📦 Let's help you rent or sell your property.",
         "select_rooms": "How many rooms should the apartment have?",
         "rooms_done": "Selected: {rooms}",
-        "no_rooms": "nothing 😢"
+        "no_rooms": "nothing 😢",
+        "select_districts": "Which districts are you interested in?",
+        "districts_done": "Selected districts: {districts}",
+        "no_districts": "nothing 😢"
     }
 }
