@@ -1,4 +1,24 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
+
+
+
+def get_main_menu(lang: str = "uk") -> ReplyKeyboardMarkup:
+    if lang == "uk":
+        return ReplyKeyboardMarkup(
+            keyboard=[
+                [KeyboardButton(text="🧹 Скинути фільтри")]
+            ],
+            resize_keyboard=True,
+            input_field_placeholder="Оберіть дію..."
+        )
+    else:
+        return ReplyKeyboardMarkup(
+            keyboard=[
+                [KeyboardButton(text="🧹 Reset filters")]
+            ],
+            resize_keyboard=True,
+            input_field_placeholder="Choose an action..."
+        )
 
 
 def get_language_keyboard() -> InlineKeyboardMarkup:
@@ -72,3 +92,16 @@ def get_budget_keyboard(lang: str, selected: list[str] = []) -> InlineKeyboardMa
     ]
     buttons.append([InlineKeyboardButton(text="✅ Готово" if lang == "uk" else "✅ Done", callback_data="budget_done")])
     return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def get_service_keyboard(lang: str) -> InlineKeyboardMarkup:
+    texts_btn = {
+        "uk": ["Орендувати квартиру", "Купити квартиру", "Здати/Продати квартиру", "🔙 Назад"],
+        "en": ["Rent a flat", "Buy a flat", "Sell a flat", "🔙 Back"]
+    }
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🏠 " + texts_btn[lang][0], callback_data="service_rent")],
+        [InlineKeyboardButton(text="💰 " + texts_btn[lang][1], callback_data="service_buy")],
+        [InlineKeyboardButton(text="🧾 " + texts_btn[lang][2], callback_data="service_sell")],
+        [InlineKeyboardButton(text=texts_btn[lang][3], callback_data="go_back")]
+    ])
