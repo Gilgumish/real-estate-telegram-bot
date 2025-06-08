@@ -29,20 +29,6 @@ def get_language_keyboard() -> InlineKeyboardMarkup:
     return keyboard
 
 
-def get_service_keyboard(lang: str) -> InlineKeyboardMarkup:
-    if lang == "en":
-        return InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="🏠 Rent", callback_data="service_rent")],
-            [InlineKeyboardButton(text="💸 Buy", callback_data="service_buy")],
-            [InlineKeyboardButton(text="🧳 Rent/Sell property", callback_data="service_sell")]
-        ])
-    return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🏠 Орендувати квартиру", callback_data="service_rent")],
-        [InlineKeyboardButton(text="💸 Купити квартиру", callback_data="service_buy")],
-        [InlineKeyboardButton(text="🧳 Здати/Продати квартиру", callback_data="service_sell")]
-    ])
-
-
 def get_room_keyboard(lang: str, selected: list[str] = []) -> InlineKeyboardMarkup:
     def checked(val):
         return "✅" if val in selected else "👉"

@@ -1,45 +1,61 @@
 import re
 from app.data import ads
 
+EN_TO_UK_DISTRICTS = {
+    "center": "Центр",
+    "lukyanivka": "Лук’янівка",
+    "pozniaky": "Позняки",
+    "obolon": "Оболонь",
+    "troieshchyna": "Троєщина",
+    "darnytsia": "Дарниця",
+    "holosiiv": "Голосієво",
+    "shuliavka": "Шулявка",
+}
+
+def normalize_district(name: str) -> str:
+    key = name.lower()
+    return EN_TO_UK_DISTRICTS.get(key, name)
 
 def parse_price(price_str: str) -> int:
     return int(re.sub(r"[^\d]", "", price_str))
 
-
 def parse_budget_range(budget_str: str) -> tuple:
-    if "до" in budget_str:
-        max_val = int(re.sub(r"[^\d]", "", budget_str))
-        return (0, max_val)
-    elif "понад" in budget_str:
-        min_val = int(re.sub(r"[^\d]", "", budget_str))
-        return (min_val + 1, float("inf"))
-    else:
-        # формат: "15 000–20 000 грн"
-        numbers = list(map(int, re.findall(r"\d+", budget_str)))
-        if len(numbers) == 2:
-            return (numbers[0], numbers[1])
-    return (0, float("inf"))  # fallback
+    text = budget_str.lower()
+    numbers = list(map(int, re.findall(r"\d+", budget_str)))
+    multiplier = 1000 if "тис" in text or "k" in text else 1
 
+    if "до" in text or "up to" in text:
+        max_val = numbers[0] * multiplier
+        return (0, max_val)
+    elif "понад" in text or "+" in text:
+        min_val = numbers[0] * multiplier
+        return (min_val + 1, float("inf"))
+    elif len(numbers) == 2:
+        return (numbers[0] * multiplier, numbers[1] * multiplier)
+
+    return (0, float("inf"))
 
 def filter_ads(user_filters: dict) -> list:
     result = []
 
+    print("🔍 Вхідні фільтри:", user_filters)
     for ad in ads:
-        # фільтр по типу послуги
+        print("➡️ Перевірка оголошення:", ad)
+
         if user_filters.get("service") and ad.get("type") != user_filters["service"]:
+            print("✖️ Пропущено через 'service'")
             continue
 
-        # фільтр по кімнатах
-        if user_filters.get("rooms") and ad["rooms"] not in user_filters["rooms"]:
+        if user_filters.get("rooms") and str(ad["rooms"]) not in user_filters["rooms"]:
+            print("✖️ Пропущено через 'rooms'")
             continue
 
-        # фільтр по районах
         if user_filters.get("districts"):
-            selected = [d.lower() for d in user_filters["districts"]]
-            if ad["district"].lower() not in selected:
+            selected = [normalize_district(d) for d in user_filters["districts"]]
+            if ad["district"] not in selected:
+                print("✖️ Пропущено через 'district'")
                 continue
 
-        # фільтр по бюджету
         price = parse_price(ad["price"])
         budget_filters = user_filters.get("budget", [])
 
@@ -51,8 +67,12 @@ def filter_ads(user_filters: dict) -> list:
                     matched = True
                     break
             if not matched:
+                print("✖️ Пропущено через 'budget'")
                 continue
 
+        print("✅ Додано до результатів")
         result.append(ad)
 
+    print("🎯 Знайдено:", len(result))
     return result
+
