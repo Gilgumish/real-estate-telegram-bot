@@ -21,3 +21,21 @@ def get_service_keyboard(lang: str) -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text="💸 Купити квартиру", callback_data="service_buy")],
         [InlineKeyboardButton(text="🧳 Здати/Продати квартиру", callback_data="service_sell")]
     ])
+
+
+def get_room_keyboard(lang: str, selected: list[str] = []) -> InlineKeyboardMarkup:
+    def checked(val):
+        return "✅" if val in selected else "👉"
+
+    if lang == "en":
+        next_btn = "✅ Next"
+    else:
+        next_btn = "✅ Далі"
+
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text=f"{checked('1')} 1", callback_data="room_1")],
+        [InlineKeyboardButton(text=f"{checked('2')} 2", callback_data="room_2")],
+        [InlineKeyboardButton(text=f"{checked('3')} 3", callback_data="room_3")],
+        [InlineKeyboardButton(text=f"{checked('4+')} 4+", callback_data="room_4+")],
+        [InlineKeyboardButton(text=next_btn, callback_data="rooms_done")]
+    ])
