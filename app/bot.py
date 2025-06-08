@@ -3,6 +3,8 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
+
+from app.utils import filter_ads
 from config import BOT_TOKEN, ADMIN_ID
 from app.keyboards import (
     get_language_keyboard,
@@ -179,12 +181,31 @@ async def select_budget(callback: CallbackQuery, state: FSMContext):
 @dp.callback_query(F.data == "budget_done")
 async def budget_done(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    lang = data["lang"]
+    lang = data.get("lang", "uk")
     selected = data.get("budget", [])
-    budget = ", ".join(selected) if selected else texts[lang]["no_budget"]
 
+    budget = ', '.join(selected) if selected else texts[lang]["no_budget"]
     await callback.message.edit_reply_markup()
-    await callback.message.answer(texts[lang]["budget_done"].format(budget=budget), reply_markup=get_main_menu(lang))
+    await callback.message.answer(texts[lang]["budget_done"].format(budget=budget))
+
+    # 🧠 Збір фільтрів користувача
+    filters = {
+        "service": data.get("service"),
+        "rooms": data.get("rooms", []),
+        "districts": data.get("districts", []),
+        "budget": data.get("budget", [])
+    }
+
+    matching_ads = filter_ads(filters)
+
+    if not matching_ads:
+        await callback.message.answer(texts[lang]["no_results"])
+        return
+
+    for ad in matching_ads:
+        caption = f"{ad[f'title_{lang}']}\n💰 {ad['price']}\n📍 {ad['district']}"
+        await callback.message.answer_photo(photo=ad["photo"], caption=caption)
+
     await callback.answer()
 
 

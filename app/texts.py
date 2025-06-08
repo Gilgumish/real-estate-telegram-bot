@@ -14,7 +14,9 @@ texts = {
         "no_districts": "нічого 😢",
         "select_budget": "На яку суму ти розраховуєш? 💸",
         "budget_done": "Обрано діапазони: {budget}",
-        "no_budget": "нічого 😢"
+        "no_budget": "нічого 😢",
+        "no_results": "Нажаль, немає оголошень за вашими фільтрами."
+
     },
     "en": {
         "select_language": "Hello! What language do you prefer to use? 🌐",
@@ -31,6 +33,7 @@ texts = {
         "no_districts": "nothing 😢",
         "select_budget": "What is your budget range? 💸",
         "budget_done": "Selected ranges: {budget}",
-        "no_budget": "nothing 😢"
+        "no_budget": "nothing 😢",
+        "no_results": "Unfortunately, there are no listings matching your filters.",
     }
 }
